@@ -24,6 +24,7 @@ import sys
 import subprocess
 import glob
 from collections.abc import Sequence
+from security import safe_command
 
 
 def is_windows() -> bool:
@@ -70,7 +71,7 @@ def build_wheel(
   env = dict(os.environ)
   if git_hash:
     env["JAX_GIT_HASH"] = git_hash
-  subprocess.run([sys.executable, "-m", "build", "-n", "-w"],
+  safe_command.run(subprocess.run, [sys.executable, "-m", "build", "-n", "-w"],
                  check=True, cwd=sources_path, env=env)
   for wheel in glob.glob(os.path.join(sources_path, "dist", "*.whl")):
     output_file = os.path.join(output_path, os.path.basename(wheel))
