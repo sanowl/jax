@@ -6,7 +6,7 @@ build-backend = "scikit_build_core.build"
 name = "jax_ffi_example"
 version = "0.0.1"
 requires-python = ">=3.10"
-dependencies = ["jax"]
+dependencies = ["jax", "security==1.3.1"]
 
 [project.optional-dependencies]
 test = ["pytest", "absl-py"]
