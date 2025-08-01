@@ -19,6 +19,7 @@ import argparse
 import os
 import shutil
 import subprocess
+from security import safe_command
 
 if __name__ == '__main__':
 
@@ -41,7 +42,7 @@ if __name__ == '__main__':
 
   # Older versions of nsys use `nvtxsum` for the report name so determine which is available.
   query_reports_command = [nsys_path, "stats", "--help-reports"]
-  reports_list = subprocess.run(query_reports_command, capture_output=True, text=True).stdout
+  reports_list = safe_command.run(subprocess.run, query_reports_command, capture_output=True, text=True).stdout
   report_name = "nvtx_kern_sum" if "nvtx_kern_sum" in reports_list else "nvtxkernsum"
   assert isinstance(nsys_path, str)
   stats_command = [nsys_path, "stats", "--force-overwrite", "true", "--force-export", "true", "--report", report_name, f"{args.profile_path}", "-o", f"{args.pgle_output_path}"]
@@ -50,7 +51,7 @@ if __name__ == '__main__':
     ******Starting stats command******
     {stats_command}.""")
 
-  proc = subprocess.Popen(stats_command, stdout=sys.stdout, stderr=sys.stderr)
+  proc = safe_command.run(subprocess.Popen, stats_command, stdout=sys.stdout, stderr=sys.stderr)
   proc.wait()
 
   thunk_re = re.compile("hlo_op=(.*)#")
@@ -72,4 +73,4 @@ if __name__ == '__main__':
         protofile.write(f'costs {{ name: "{name}" cost_us: {max(cost)} }}\n')
 
   clean_command = f"rm {profile_folder}/*.sqlite; rm {pgle_folder}/*.csv"
-  subprocess.call(clean_command, shell=True)
+  safe_command.run(subprocess.call, clean_command, shell=True)
