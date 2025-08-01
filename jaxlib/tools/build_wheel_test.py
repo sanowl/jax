@@ -20,11 +20,12 @@ import sys
 import tempfile
 
 from bazel_tools.tools.python.runfiles import runfiles
+from security import safe_command
 
 r = runfiles.Create()
 
 with tempfile.TemporaryDirectory(prefix="jax_build_wheel_test") as tmpdir:
-  subprocess.run([
+  safe_command.run(subprocess.run, [
     sys.executable, r.Rlocation("__main__/jaxlib/tools/build_wheel.py"),
     f"--cpu={platform.machine()}",
     f"--output_path={tmpdir}",
